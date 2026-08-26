@@ -1,7 +1,6 @@
 # Environments and Secrets
 .env
 .env.*
-!.env.example
 *.env
 
 # Python Bytecode and Cache
@@ -33,6 +32,11 @@ build/
 .tempmediaStorage/
 .user_uploaded/
 scratch/
+
+# Presentation & Briefing Materials (Local only)
+SIH_PITCH_SCRIPT.*
+SIH_PROJECT_MASTER_BRIEF.*
+generate_pdfs.py
 
 # Raw PDF Dataset (Master data paimana_timeseries_master.csv & paimana.db are tracked)
 dataset sih/
