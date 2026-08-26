@@ -1,0 +1,50 @@
+# Environments and Secrets
+.env
+.env.*
+!.env.example
+*.env
+
+# Python Bytecode and Cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+htmlcov/
+*.egg-info/
+
+# Virtual Environments
+venv/
+.venv/
+env/
+ENV/
+
+# Node.js & Frontend Build Artifacts
+node_modules/
+frontend/node_modules/
+frontend/dist/
+dist/
+build/
+
+# Temporary HTML & Media
+*.temp.html
+*_temp.html
+.tempmediaStorage/
+.user_uploaded/
+scratch/
+
+# Raw PDF Dataset (Master data paimana_timeseries_master.csv & paimana.db are tracked)
+dataset sih/
+
+# IDE & OS Junk
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+*.log
+\# MASTER BUILD PROMPT.txt
+*MASTER BUILD PROMPT*
+*.tmp
