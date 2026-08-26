@@ -1,15 +1,15 @@
 @echo off
 echo ==============================================================================
-echo   STARTING PAIMANA INTELLIGENCE SYSTEM
+echo   STARTING INFRAPULSE INTELLIGENCE SYSTEM
 echo ==============================================================================
 echo.
 
 echo [1/2] Launching FastAPI Backend on http://127.0.0.1:8000 ...
-start "PAIMANA Backend (FastAPI)" cmd /k "python -u -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000"
+start "InfraPulse Backend (FastAPI)" cmd /k "python -u -m uvicorn backend.app.main:app --host 127.0.0.1 --port 8000"
 
 echo [2/2] Launching Vite Frontend on http://localhost:5173 ...
 cd frontend
-start "PAIMANA Frontend (Vite)" cmd /k "npm run dev"
+start "InfraPulse Frontend (Vite)" cmd /k "npm run dev"
 
 echo.
 echo ==============================================================================

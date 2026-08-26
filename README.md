@@ -1,4 +1,4 @@
-# PAIMANA Intelligence — AI-Powered Infrastructure Project Monitoring & Early Warning System
+# InfraPulse — AI-Powered Infrastructure Project Monitoring & Early Warning System
 
 > **Decision-Support Command Center for Central Sector Infrastructure Projects**  
 > *Inspired by the Ministry of Statistics & Programme Implementation (MoSPI), Government of India — Infrastructure & Project Monitoring Division (IPMD)*
@@ -7,7 +7,7 @@
 
 ## 🏛️ Executive Summary
 
-**PAIMANA Intelligence** is an end-to-end analytical decision-support prototype designed to transform infrastructure monitoring from retrospective status reporting (*"What happened?"*) into predictive and prescriptive early warning intelligence (*"What is likely to happen, why, and what should administrators examine?"*).
+**InfraPulse** is an end-to-end analytical decision-support system designed to transform infrastructure monitoring from retrospective status reporting (*"What happened?"*) into predictive and prescriptive early warning intelligence (*"What is likely to happen, why, and what should administrators examine?"*).
 
 Built upon a longitudinal panel of **21,863 monthly project observations** spanning **April 2025 through July 2026** across **3,842 Central Sector Infrastructure Projects (₹150 Cr & Above)**, the system dynamically calculates 4-month rolling velocity vectors, multi-signal heuristic risk scores, trajectory-based cost and time overrun projections, multi-criteria early warning alerts, and explainable driver breakdowns.
 

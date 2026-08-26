@@ -53,7 +53,7 @@ export default function GovHeader({ latestDate = 'July 2026' }) {
           <div className="text-right">
             <div className="inline-flex items-center gap-1.5 px-2 py-0.5 rounded bg-blue-50 border border-blue-200 text-blue-900 text-xs font-bold uppercase tracking-wider">
               <ShieldCheck size={14} className="text-blue-700" />
-              PAIMANA Intelligence
+              InfraPulse Intelligence
             </div>
             <p className="text-[11px] text-slate-500 mt-0.5">Decision-Support System for Infrastructure</p>
           </div>

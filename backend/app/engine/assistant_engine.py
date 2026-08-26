@@ -116,7 +116,7 @@ class ProjectIntelligenceAssistant:
         # Fallback general summary
         kpis = data_service_instance.get_dashboard_kpis()
         answer = (
-            f"**PAIMANA Intelligence Portfolio Overview**:\n\n"
+            f"**InfraPulse Intelligence Portfolio Overview**:\n\n"
             f"- **Projects Monitored**: {kpis.total_projects_monitored:,} central sector projects\n"
             f"- **Total Approved Cost**: ₹{kpis.total_original_cost_cr:,.0f} Cr\n"
             f"- **Total Revised Cost**: ₹{kpis.total_revised_cost_cr:,.0f} Cr (+{kpis.overall_cost_escalation_pct:.1f}% escalation)\n"

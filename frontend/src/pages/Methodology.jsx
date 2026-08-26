@@ -68,7 +68,7 @@ export default function Methodology() {
           </h1>
         </div>
         <p className="text-xs text-slate-500 mt-0.5">
-          Comprehensive architecture, mathematical formulations, and model roadmap for PAIMANA Intelligence
+          Comprehensive architecture, mathematical formulations, and model roadmap for InfraPulse Intelligence
         </p>
       </div>
 

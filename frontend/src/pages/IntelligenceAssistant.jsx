@@ -28,7 +28,7 @@ export default function IntelligenceAssistant() {
   const [messages, setMessages] = useState([
     {
       sender: 'assistant',
-      text: "Welcome to **PAIMANA Intelligence Assistant**. I provide factually verified, hallucination-free decision-support answers computed directly from the 21,863 longitudinal infrastructure project records.\n\nYou can ask about high-risk projects, sectoral cost escalations, slippage ratios, or specific project deep dives.",
+      text: "Welcome to **InfraPulse Intelligence Assistant**. I provide factually verified, hallucination-free decision-support answers computed directly from the 21,863 longitudinal infrastructure project records.\n\nYou can ask about high-risk projects, sectoral cost escalations, slippage ratios, or specific project deep dives.",
       suggested_followups: PROMPT_CHIPS
     }
   ]);

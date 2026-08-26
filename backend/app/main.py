@@ -9,13 +9,13 @@ from .database.init_db import init_database
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Ensure database schema is initialized and loaded
-    print(f"[PAIMANA API] Starting {settings.PROJECT_NAME} v{settings.VERSION}...")
+    print(f"[InfraPulse API] Starting {settings.PROJECT_NAME} v{settings.VERSION}...")
     try:
         init_database()
     except Exception as e:
-        print(f"[PAIMANA API] Warning during DB initialization: {e}")
+        print(f"[InfraPulse API] Warning during DB initialization: {e}")
     yield
-    print("[PAIMANA API] Shutting down...")
+    print("[InfraPulse API] Shutting down...")
 
 app = FastAPI(
     title=settings.PROJECT_NAME,
@@ -38,7 +38,7 @@ app.include_router(router, prefix=settings.API_PREFIX)
 def root():
     return {
         "status": "online",
-        "system": "PAIMANA Intelligence API",
+        "system": "InfraPulse Intelligence API",
         "version": settings.VERSION,
         "docs_url": "/docs",
         "api_prefix": settings.API_PREFIX
