@@ -3,24 +3,26 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from .api.routes import router
+from .api.auth import router as auth_router
+from .api.interventions import router as interventions_router
 from .config import settings
 from .database.init_db import init_database
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup: Ensure database schema is initialized and loaded
-    print(f"[InfraPulse API] Starting {settings.PROJECT_NAME} v{settings.VERSION}...")
+    print(f"[PAIMANA Intelligence] Starting {settings.PROJECT_NAME} v{settings.VERSION}...")
     try:
         init_database()
     except Exception as e:
-        print(f"[InfraPulse API] Warning during DB initialization: {e}")
+        print(f"[PAIMANA Intelligence] Warning during DB initialization: {e}")
     yield
-    print("[InfraPulse API] Shutting down...")
+    print("[PAIMANA Intelligence] Shutting down...")
 
 app = FastAPI(
-    title=settings.PROJECT_NAME,
+    title="PAIMANA Intelligence",
     version=settings.VERSION,
-    description="AI-Powered Infrastructure Project Monitoring & Early Warning Decision Support System (MoSPI / IPMD inspired).",
+    description="AI-Powered Infrastructure Project Monitoring & Early Warning Decision Support System.",
     lifespan=lifespan
 )
 
@@ -32,6 +34,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.include_router(auth_router, prefix=f"{settings.API_PREFIX}/auth", tags=["auth"])
+app.include_router(interventions_router, prefix=f"{settings.API_PREFIX}/interventions", tags=["interventions"])
 app.include_router(router, prefix=settings.API_PREFIX)
 
 @app.get("/")

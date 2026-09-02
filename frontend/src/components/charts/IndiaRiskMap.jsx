@@ -60,23 +60,23 @@ export default function IndiaRiskMap({
 
   const getBorderColor = (stateName) => {
     const s = summaryMap[stateName.toLowerCase()];
-    if (!s) return '#94A3B8';
+    if (!s) return '#CBD5E1';
     if (s.critical_count > 10 || s.avg_risk_score >= 60) return '#DC2626';
     if (s.high_count > 15 || s.avg_risk_score >= 45) return '#D97706';
     return '#059669';
   };
 
   return (
-    <div className="w-full flex flex-col md:flex-row items-center gap-6 p-4">
+    <div className="w-full flex flex-col md:flex-row items-center gap-6 p-2">
       {/* Interactive Grid Map */}
-      <div className="relative w-full max-w-lg aspect-[1/1] bg-slate-50 border border-slate-200 rounded-lg p-2 shadow-inner overflow-hidden">
-        <svg viewBox="0 0 100 105" className="w-full h-full">
+      <div className="relative w-full max-w-lg aspect-[1/1] bg-[#E9F2FA] border border-[#CBDCEB] rounded-xl p-3 shadow-inner overflow-hidden flex items-center justify-center">
+        <svg viewBox="0 0 100 105" className="w-full h-full drop-shadow-xs">
           {INDIA_REGIONS.map((region) => {
             const isSelected = selectedState && selectedState.toLowerCase() === region.name.toLowerCase();
             const isHovered = hoveredState && hoveredState.name === region.name;
             const fillColor = getStateColor(region.name);
-            const strokeColor = isSelected ? '#002B50' : getBorderColor(region.name);
-            const strokeWidth = isSelected ? 1.5 : (isHovered ? 1.0 : 0.4);
+            const strokeColor = isSelected ? '#102A72' : (isHovered ? '#13A8E0' : getBorderColor(region.name));
+            const strokeWidth = isSelected ? 1.8 : (isHovered ? 1.4 : 0.4);
 
             return (
               <g
@@ -91,18 +91,18 @@ export default function IndiaRiskMap({
                   y={region.y}
                   width={region.w}
                   height={region.h}
-                  rx={2}
+                  rx={2.5}
                   fill={fillColor}
                   stroke={strokeColor}
                   strokeWidth={strokeWidth}
-                  className="hover:opacity-90"
+                  className="transition-opacity hover:opacity-90"
                 />
                 <text
                   x={region.x + region.w / 2}
                   y={region.y + region.h / 2 + 1}
                   textAnchor="middle"
                   dominantBaseline="middle"
-                  className="font-bold pointer-events-none select-none text-slate-800"
+                  className="font-bold pointer-events-none select-none text-[#10213D]"
                   style={{ fontSize: region.id === 'PAN' ? '2.4px' : '2.8px' }}
                 >
                   {region.id}
@@ -113,27 +113,27 @@ export default function IndiaRiskMap({
         </svg>
 
         {/* Legend */}
-        <div className="absolute bottom-2 left-2 flex flex-wrap gap-2 text-[10px] bg-white/95 p-1.5 rounded border border-slate-300 shadow-sm">
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-red-300 border border-red-600" /> Critical Risk</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-amber-200 border border-amber-600" /> Elevated Risk</div>
-          <div className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded bg-emerald-200 border border-emerald-600" /> Low Risk</div>
+        <div className="absolute bottom-2.5 left-2.5 flex flex-wrap gap-2 text-[10px] bg-white/95 backdrop-blur-xs px-2.5 py-1.5 rounded-lg border border-[#CBDCEB] shadow-xs font-medium">
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-red-300 border border-red-600" /> Critical</div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-amber-200 border border-amber-600" /> Elevated</div>
+          <div className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-emerald-200 border border-emerald-600" /> Low Risk</div>
         </div>
       </div>
 
       {/* State Detail Side Panel */}
-      <div className="flex-1 w-full flex flex-col justify-between self-stretch bg-white border border-slate-200 rounded-lg p-4 shadow-sm">
+      <div className="flex-1 w-full flex flex-col justify-between self-stretch bg-white border border-[#C8DAEB] rounded-xl p-4 sm:p-5 shadow-xs">
         <div>
-          <div className="flex items-center justify-between pb-2 border-b border-slate-100 mb-3">
+          <div className="flex items-center justify-between pb-3 border-b border-[#E2EDF7] mb-3.5">
             <div className="flex items-center gap-2">
-              <MapPin size={18} className="text-blue-700" />
-              <h3 className="font-bold text-slate-800 text-sm">
+              <MapPin size={18} className="text-[#13A8E0]" />
+              <h3 className="font-bold text-[#10213D] text-sm">
                 {hoveredState?.name || selectedState || 'National Infrastructure Spread'}
               </h3>
             </div>
             {selectedState && (
               <button
                 onClick={() => onSelectState(null)}
-                className="text-[11px] text-blue-700 hover:underline font-medium"
+                className="text-[11px] text-[#102A72] hover:text-[#13A8E0] hover:underline font-bold"
               >
                 Clear Selection
               </button>
@@ -141,7 +141,7 @@ export default function IndiaRiskMap({
           </div>
 
           {hoveredState || selectedState ? (
-            <div className="space-y-3">
+            <div className="space-y-3.5">
               {(() => {
                 const sName = (hoveredState?.name || selectedState).toLowerCase();
                 const data = summaryMap[sName] || {
@@ -153,29 +153,29 @@ export default function IndiaRiskMap({
                 };
                 return (
                   <>
-                    <div className="grid grid-cols-2 gap-2 text-xs">
-                      <div className="p-2 bg-slate-50 rounded border border-slate-200">
-                        <span className="text-slate-500 block text-[10px] uppercase font-semibold">Monitored Projects</span>
-                        <strong className="text-base text-slate-900">{data.project_count.toLocaleString()}</strong>
+                    <div className="grid grid-cols-2 gap-2.5 text-xs">
+                      <div className="p-3 bg-[#F2F7FD] rounded-lg border border-[#D5E3F0]">
+                        <span className="text-[#475569] block text-[10px] uppercase font-bold tracking-wider">Monitored Projects</span>
+                        <strong className="text-base text-[#10213D] font-mono font-bold mt-0.5 block">{data.project_count.toLocaleString()}</strong>
                       </div>
-                      <div className="p-2 bg-slate-50 rounded border border-slate-200">
-                        <span className="text-slate-500 block text-[10px] uppercase font-semibold">Total Cost</span>
-                        <strong className="text-base text-slate-900">₹{data.total_cost_cr.toLocaleString()} Cr</strong>
+                      <div className="p-3 bg-[#F2F7FD] rounded-lg border border-[#D5E3F0]">
+                        <span className="text-[#475569] block text-[10px] uppercase font-bold tracking-wider">Total Sanctioned</span>
+                        <strong className="text-base text-[#10213D] font-mono font-bold mt-0.5 block">₹{data.total_cost_cr.toLocaleString()} Cr</strong>
                       </div>
                     </div>
 
-                    <div className="p-2.5 bg-slate-50 rounded border border-slate-200 text-xs space-y-1.5">
-                      <div className="flex justify-between">
-                        <span className="text-slate-600">Average Risk Score:</span>
-                        <strong className="text-slate-900">{data.avg_risk_score ? data.avg_risk_score.toFixed(1) : 'N/A'}/100</strong>
+                    <div className="p-3 bg-[#F2F7FD] rounded-lg border border-[#D5E3F0] text-xs space-y-2">
+                      <div className="flex justify-between items-center">
+                        <span className="text-[#334155] font-medium">Average Risk Score:</span>
+                        <strong className="text-[#10213D] font-mono">{data.avg_risk_score ? data.avg_risk_score.toFixed(1) : 'N/A'}/100</strong>
                       </div>
-                      <div className="flex justify-between text-red-700">
+                      <div className="flex justify-between items-center text-red-700 font-medium">
                         <span>Critical Risk Projects:</span>
-                        <strong>{data.critical_count}</strong>
+                        <strong className="font-mono">{data.critical_count}</strong>
                       </div>
-                      <div className="flex justify-between text-amber-700">
+                      <div className="flex justify-between items-center text-amber-700 font-medium">
                         <span>High Risk Projects:</span>
-                        <strong>{data.high_count}</strong>
+                        <strong className="font-mono">{data.high_count}</strong>
                       </div>
                     </div>
 
@@ -187,15 +187,16 @@ export default function IndiaRiskMap({
               })()}
             </div>
           ) : (
-            <div className="py-8 text-center text-xs text-slate-400">
-              <Layers size={32} className="mx-auto mb-2 opacity-50" />
+            <div className="py-10 text-center text-xs text-slate-400">
+              <Layers size={32} className="mx-auto mb-2 text-slate-300" />
               Hover over or click any state block on the map to inspect regional infrastructure density and risk concentrations.
             </div>
           )}
         </div>
 
-        <div className="text-[11px] text-slate-400 pt-3 border-t border-slate-100">
-          Source: MoSPI Flash Report State & Project-Level Spatial Ingestion
+        <div className="text-[11px] text-slate-400 pt-3 border-t border-slate-100 flex items-center justify-between">
+          <span>Source: MoSPI Flash Report Ingestion</span>
+          <span className="font-mono text-[10px] text-slate-500 font-semibold">28 States & UTs</span>
         </div>
       </div>
     </div>

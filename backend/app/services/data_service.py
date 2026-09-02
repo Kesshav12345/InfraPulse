@@ -16,7 +16,8 @@ from ..database.schemas import (
     TrajectoryPoint,
     CostPrediction,
     TimePrediction,
-    RiskAssessmentOutput
+    RiskAssessmentOutput,
+    DataHealthOutput
 )
 
 class DataService:
@@ -598,5 +599,91 @@ class DataService:
         sub = self.latest_df[self.latest_df['slippage_ratio'] >= threshold].sort_values('slippage_ratio', ascending=False)
         return sub.head(limit).to_dict('records')
 
+    def get_data_health_stats(self) -> DataHealthOutput:
+        """Computes comprehensive data quality and model eligibility metrics."""
+        from ..database.database import DB_ENGINE_TYPE
+        
+        df = self.df
+        total_records = len(df)
+        if total_records == 0:
+            return DataHealthOutput(
+                total_records=0, unique_projects=0, earliest_report_date="N/A", latest_report_date="N/A",
+                months_covered_count=0, database_engine=DB_ENGINE_TYPE.upper(),
+                cost_below_150cr_count=0, invalid_physical_progress_count=0,
+                negative_cumulative_expenditure_count=0, negative_financial_burn_count=0,
+                invalid_revised_cost_count=0, missing_physical_progress_count=0,
+                missing_completion_dates_count=0, duplicate_records_count=0,
+                malformed_dates_count=0, inconsistent_geography_count=0,
+                short_history_count=0, eligible_for_cost_model_count=0,
+                eligible_for_schedule_model_count=0, excluded_count=0,
+                exclusion_reasons={}, data_quality_pct=0.0, status="EMPTY"
+            )
+
+        unique_projects = int(df['Project_Code'].nunique())
+        
+        # Calculate individual flags
+        cost_below_150cr = int((df['Original_Cost'].fillna(0) < 150.0).sum())
+        invalid_prog = int(((df['Physical_Progress'] < 0) | (df['Physical_Progress'] > 100)).sum())
+        neg_exp = int((df['Cumulative_Expenditure'] < 0).sum())
+        neg_burn = int((df['Financial_Burn_Rate'] < 0).sum())
+        invalid_rev = int((df['Revised_Cost'].fillna(0) <= 0).sum())
+        missing_prog = int(df['Physical_Progress'].isna().sum())
+        missing_dates = int((df['Original_Target_DoC'].isna() & df['Revised_DoC'].isna()).sum())
+        dup_records = int(df.duplicated(subset=['Project_Code', 'Report_Date']).sum())
+        malformed_dates = int(df['Report_Date_DT'].isna().sum())
+        inconsistent_geo = int((df['State'].isna() | (df['State'] == '')).sum())
+        
+        # Short history (<4 records) per unique project
+        counts_per_project = df.groupby('Project_Code').size()
+        short_history = int((counts_per_project < 4).sum())
+        
+        # Eligibility
+        exclusion_reasons = {
+            "Invalid/Missing Progress": missing_prog + invalid_prog,
+            "Invalid Cost Data": cost_below_150cr + invalid_rev + neg_exp,
+            "Missing Dates": missing_dates
+        }
+        
+        excluded_count = min(total_records, sum(exclusion_reasons.values()))
+        eligible_cost = max(0, total_records - (missing_prog + cost_below_150cr + invalid_rev + neg_exp))
+        eligible_sched = max(0, total_records - (missing_prog + missing_dates))
+        
+        # Data Quality Percentage
+        quality_pct = 100.0 - ((excluded_count / max(1, total_records)) * 100.0)
+        quality_pct = max(0.0, min(100.0, quality_pct))
+        
+        earliest_dt = df['Report_Date_DT'].min()
+        latest_dt = df['Report_Date_DT'].max()
+        earliest_str = earliest_dt.strftime('%Y-%m-%d') if pd.notna(earliest_dt) else "N/A"
+        latest_str = latest_dt.strftime('%Y-%m-%d') if pd.notna(latest_dt) else "N/A"
+        months_covered = int(round((latest_dt - earliest_dt).days / 30.4)) if pd.notna(earliest_dt) and pd.notna(latest_dt) else 0
+
+        return DataHealthOutput(
+            total_records=total_records,
+            unique_projects=unique_projects,
+            earliest_report_date=earliest_str,
+            latest_report_date=latest_str,
+            months_covered_count=months_covered,
+            database_engine=DB_ENGINE_TYPE.upper(),
+            cost_below_150cr_count=cost_below_150cr,
+            invalid_physical_progress_count=invalid_prog,
+            negative_cumulative_expenditure_count=neg_exp,
+            negative_financial_burn_count=neg_burn,
+            invalid_revised_cost_count=invalid_rev,
+            missing_physical_progress_count=missing_prog,
+            missing_completion_dates_count=missing_dates,
+            duplicate_records_count=dup_records,
+            malformed_dates_count=malformed_dates,
+            inconsistent_geography_count=inconsistent_geo,
+            short_history_count=short_history,
+            eligible_for_cost_model_count=eligible_cost,
+            eligible_for_schedule_model_count=eligible_sched,
+            excluded_count=excluded_count,
+            exclusion_reasons=exclusion_reasons,
+            data_quality_pct=round(quality_pct, 1),
+            status="OPERATIONAL"
+        )
+
 # Singleton data service
 data_service = DataService()
+

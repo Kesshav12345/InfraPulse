@@ -16,6 +16,7 @@ import RiskBadge from '../components/common/RiskBadge';
 import PortfolioRiskDonut from '../components/charts/PortfolioRiskDonut';
 import IndiaRiskMap from '../components/charts/IndiaRiskMap';
 import SectorComparisonChart from '../components/charts/SectorComparisonChart';
+import HeroSlideshow from '../components/common/HeroSlideshow';
 import { LoadingSkeleton, ErrorState } from '../components/common/LoadingStates';
 
 export default function Dashboard() {
@@ -78,37 +79,40 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-6 space-y-6 max-w-[1600px] mx-auto">
       {/* Page Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-2 border-b border-slate-200">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 pb-3 border-b border-[#C8DAEB]">
         <div>
-          <h1 className="text-xl font-black text-[#002B50] tracking-tight uppercase">
+          <h1 className="text-xl sm:text-2xl font-black text-[#10213D] tracking-tight uppercase">
             Infrastructure Project Intelligence
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
+          <p className="text-xs sm:text-sm text-[#475569] font-medium mt-0.5">
             Predictive decision-support monitoring of Central Sector Infrastructure Projects (₹150 Cr & Above)
           </p>
         </div>
-        <div className="flex items-center gap-2 text-xs">
+        <div className="flex items-center gap-2.5 text-xs">
           <button
             onClick={() => navigate('/early-warnings')}
-            className="px-3 py-1.5 bg-red-700 hover:bg-red-800 text-white rounded font-medium inline-flex items-center gap-1.5 shadow-sm transition"
+            className="px-3.5 py-2 bg-[#DC2626] hover:bg-[#B91C1C] text-white rounded-lg font-semibold inline-flex items-center gap-1.5 shadow-xs hover:shadow transition"
           >
-            <ShieldAlert size={14} />
+            <ShieldAlert size={15} />
             Early Warning Center ({kpis?.projects_requiring_attention || 0})
           </button>
           <button
             onClick={() => navigate('/projects')}
-            className="px-3 py-1.5 bg-blue-900 hover:bg-blue-950 text-white rounded font-medium inline-flex items-center gap-1.5 shadow-sm transition"
+            className="px-3.5 py-2 bg-[#102A72] hover:bg-[#0E235C] text-white rounded-lg font-semibold inline-flex items-center gap-1.5 shadow-xs hover:shadow transition border-b-2 border-b-[#13A8E0]"
           >
-            <FolderKanban size={14} />
+            <FolderKanban size={15} />
             Project Directory
           </button>
         </div>
       </div>
 
+      {/* Hero Slideshow Banner */}
+      <HeroSlideshow />
+
       {/* KPI Cards Row */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4.5">
         <MetricCard
           title="Projects Monitored"
           value={kpis?.total_projects_monitored?.toLocaleString() || '0'}
@@ -118,7 +122,7 @@ export default function Dashboard() {
         <MetricCard
           title="Approved Cost"
           value={`₹${(kpis?.total_original_cost_cr || 0).toLocaleString(undefined, { maximumFractionDigits: 0 })} Cr`}
-          subtitle="Original sanction cost baseline"
+          subtitle="Original sanction baseline"
           icon={Coins}
         />
         <MetricCard
@@ -149,35 +153,41 @@ export default function Dashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Risk Distribution Donut (4 cols) */}
         <div className="lg:col-span-4 gov-card p-5 flex flex-col justify-between">
-          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center">
-            <h2 className="font-bold text-sm text-slate-800">Portfolio Risk Distribution</h2>
-            <span className="text-[11px] text-slate-500">Heuristic-v1.0</span>
-          </div>
-          <PortfolioRiskDonut distribution={riskDistribution} />
-          <div className="grid grid-cols-2 gap-2 mt-4 pt-3 border-t border-slate-100 text-xs">
-            <div className="p-2 bg-red-50/60 rounded border border-red-200">
-              <span className="text-red-700 font-semibold block text-[11px]">Critical Risk</span>
-              <strong className="text-slate-900 text-sm">{kpis?.critical_risk_count || 0}</strong> projects
+          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center bg-gradient-to-r from-[#EEF5FB] to-[#E4EFF9] border-b border-[#CFE1F2]">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-[#13A8E0] rounded-full inline-block" />
+              <h2 className="font-bold text-sm text-[#10213D] tracking-tight">Portfolio Risk Distribution</h2>
             </div>
-            <div className="p-2 bg-amber-50/60 rounded border border-amber-200">
-              <span className="text-amber-700 font-semibold block text-[11px]">High Risk</span>
-              <strong className="text-slate-900 text-sm">{kpis?.high_risk_count || 0}</strong> projects
+            <span className="text-[11px] text-[#475569] font-mono font-medium">Heuristic-v1.0</span>
+          </div>
+          <div className="bg-[#F5F9FD] p-2.5 rounded-xl border border-[#D5E5F2] my-1">
+            <PortfolioRiskDonut distribution={riskDistribution} />
+          </div>
+          <div className="grid grid-cols-2 gap-2.5 mt-4 pt-3.5 border-t border-[#E2EDF7] text-xs">
+            <div className="p-2.5 bg-[#FEF2F2] rounded-lg border border-red-200 border-l-4 border-l-[#DC2626]">
+              <span className="text-red-800 font-bold block text-[10.5px] uppercase tracking-wider">Critical Risk</span>
+              <strong className="text-[#10213D] text-base font-mono mt-0.5 block">{kpis?.critical_risk_count || 0} <span className="text-xs font-normal text-slate-500">projects</span></strong>
+            </div>
+            <div className="p-2.5 bg-[#FEF8F0] rounded-lg border border-orange-200 border-l-4 border-l-[#F7941D]">
+              <span className="text-[#9A4C00] font-bold block text-[10.5px] uppercase tracking-wider">High Risk</span>
+              <strong className="text-[#10213D] text-base font-mono mt-0.5 block">{kpis?.high_risk_count || 0} <span className="text-xs font-normal text-slate-500">projects</span></strong>
             </div>
           </div>
         </div>
 
         {/* India Infrastructure Risk Map (8 cols) */}
         <div className="lg:col-span-8 gov-card p-5 flex flex-col justify-between">
-          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center">
+          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center bg-gradient-to-r from-[#EEF5FB] to-[#E4EFF9] border-b border-[#CFE1F2]">
             <div className="flex items-center space-x-2">
-              <h2 className="font-bold text-sm text-slate-800">India Infrastructure Risk & Density Map</h2>
+              <span className="w-1.5 h-4 bg-[#13A8E0] rounded-full inline-block" />
+              <h2 className="font-bold text-sm text-[#10213D] tracking-tight">India Infrastructure Risk & Density Map</h2>
               {selectedState && (
-                <span className="bg-blue-100 text-blue-800 text-[11px] font-semibold px-2 py-0.5 rounded">
+                <span className="bg-[#E0F2FE] text-[#102A72] border border-[#BAE6FD] text-[11px] font-bold px-2.5 py-0.5 rounded-full ml-1">
                   Filtered: {selectedState}
                 </span>
               )}
             </div>
-            <span className="text-[11px] text-slate-500">Spatial Ingestion</span>
+            <span className="text-[11px] text-[#475569] font-mono font-medium">Spatial Ingestion</span>
           </div>
           <IndiaRiskMap
             stateSummaries={stateRisks}
@@ -193,23 +203,23 @@ export default function Dashboard() {
       {/* Projects Requiring Attention & Sector Performance */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Critical Projects Attention Table (7 cols) */}
-        <div className="lg:col-span-7 gov-card p-5">
-          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center">
+        <div className="lg:col-span-7 gov-card p-5 border-t-3 border-t-[#DC2626]">
+          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center bg-gradient-to-r from-[#EEF5FB] to-[#E4EFF9] border-b border-[#CFE1F2]">
             <div className="flex items-center space-x-2">
-              <ShieldAlert size={16} className="text-red-600" />
-              <h2 className="font-bold text-sm text-slate-800">Projects Requiring Immediate Attention</h2>
+              <ShieldAlert size={17} className="text-[#DC2626]" />
+              <h2 className="font-bold text-sm text-[#10213D] tracking-tight">Projects Requiring Immediate Attention</h2>
             </div>
             <button
               onClick={() => navigate('/early-warnings')}
-              className="text-xs text-blue-700 hover:underline font-semibold inline-flex items-center gap-1"
+              className="text-xs text-[#102A72] hover:text-[#13A8E0] font-bold inline-flex items-center gap-1 transition-colors"
             >
               View All Alerts <ArrowRight size={13} />
             </button>
           </div>
 
-          <div className="overflow-x-auto">
+          <div className="overflow-x-auto rounded-lg border border-[#C8DAEB]">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-100 text-slate-600 font-semibold border-b border-slate-200">
+              <thead className="bg-[#E2EDF7] text-[#10213D] font-bold uppercase text-[10.5px] tracking-wider border-b border-[#C8DAEB]">
                 <tr>
                   <th className="py-2.5 px-3">Project</th>
                   <th className="py-2.5 px-3">Sector / State</th>
@@ -219,29 +229,29 @@ export default function Dashboard() {
                   <th className="py-2.5 px-2">Action</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-slate-200">
-                {criticalProjects.map((p) => (
+              <tbody className="divide-y divide-[#E4EEF8]">
+                {criticalProjects.map((p, idx) => (
                   <tr
                     key={p.project_code}
                     onClick={() => navigate(`/project/${encodeURIComponent(p.project_code)}`)}
-                    className="hover:bg-blue-50/50 cursor-pointer transition"
+                    className={`${idx % 2 === 0 ? 'bg-white' : 'bg-[#F9FCFE]'} hover:bg-[#EBF4FC] cursor-pointer transition duration-150 group`}
                   >
                     <td className="py-2.5 px-3 max-w-[200px]">
-                      <div className="font-bold text-slate-900 truncate" title={p.project_name}>
+                      <div className="font-bold text-[#10213D] truncate group-hover:text-[#13A8E0] transition-colors" title={p.project_name}>
                         {p.project_name}
                       </div>
-                      <div className="text-[10px] text-slate-500 font-mono">Code: {p.project_code}</div>
+                      <div className="text-[10px] text-[#64748B] font-mono mt-0.5">Code: {p.project_code}</div>
                     </td>
-                    <td className="py-2.5 px-3 text-slate-600">
-                      <div className="truncate max-w-[130px] font-medium">{p.sector}</div>
-                      <div className="text-[10px] text-slate-500">{p.state}</div>
+                    <td className="py-2.5 px-3 text-[#334155]">
+                      <div className="truncate max-w-[130px] font-semibold text-[#10213D]">{p.sector}</div>
+                      <div className="text-[10px] text-[#64748B] mt-0.5">{p.state}</div>
                     </td>
-                    <td className="py-2.5 px-3 text-right font-mono font-bold text-slate-900">
+                    <td className="py-2.5 px-3 text-right font-mono font-bold text-[#10213D]">
                       ₹{p.revised_cost?.toLocaleString() || 0} Cr
                     </td>
                     <td className="py-2.5 px-3 text-center font-mono">
-                      <div className="font-semibold text-slate-800">{p.physical_progress?.toFixed(1) || 0}%</div>
-                      <div className="text-[10px] text-slate-500">
+                      <div className="font-bold text-[#10213D]">{p.physical_progress?.toFixed(1) || 0}%</div>
+                      <div className="text-[10px] text-[#64748B] mt-0.5">
                         {p.physical_progress_velocity ? `+${p.physical_progress_velocity.toFixed(1)}%/mo` : '0%/mo'}
                       </div>
                     </td>
@@ -249,7 +259,7 @@ export default function Dashboard() {
                       <RiskBadge level={p.risk_level} score={p.risk_score} size="sm" />
                     </td>
                     <td className="py-2.5 px-2 text-right">
-                      <ChevronRight size={16} className="text-slate-400" />
+                      <ChevronRight size={16} className="text-slate-400 group-hover:text-[#13A8E0] group-hover:translate-x-0.5 transition-all" />
                     </td>
                   </tr>
                 ))}
@@ -260,19 +270,24 @@ export default function Dashboard() {
 
         {/* Sector Analytics Summary (5 cols) */}
         <div className="lg:col-span-5 gov-card p-5 flex flex-col justify-between">
-          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center">
-            <h2 className="font-bold text-sm text-slate-800">Sector Performance & Cost Escalation</h2>
+          <div className="gov-card-header -mx-5 -mt-5 mb-4 flex justify-between items-center bg-gradient-to-r from-[#EEF5FB] to-[#E4EFF9] border-b border-[#CFE1F2]">
+            <div className="flex items-center gap-2">
+              <span className="w-1.5 h-4 bg-[#13A8E0] rounded-full inline-block" />
+              <h2 className="font-bold text-sm text-[#10213D] tracking-tight">Sector Performance & Cost Escalation</h2>
+            </div>
             <button
               onClick={() => navigate('/sectors')}
-              className="text-xs text-blue-700 hover:underline font-semibold inline-flex items-center gap-1"
+              className="text-xs text-[#102A72] hover:text-[#13A8E0] font-bold inline-flex items-center gap-1 transition-colors"
             >
               Full Analytics <ArrowRight size={13} />
             </button>
           </div>
-          <SectorComparisonChart sectors={sectors} />
-          <div className="pt-3 border-t border-slate-100 text-xs text-slate-500 flex justify-between items-center">
-            <span>Aggregated across {sectors.length} national sectors</span>
-            <span className="font-semibold text-slate-800">Longitudinal Baseline</span>
+          <div className="bg-[#F5F9FD] p-2.5 rounded-xl border border-[#D5E5F2]">
+            <SectorComparisonChart sectors={sectors} />
+          </div>
+          <div className="pt-3.5 border-t border-[#E2EDF7] text-xs text-[#475569] flex justify-between items-center">
+            <span className="font-medium">Aggregated across {sectors.length} national sectors</span>
+            <span className="font-bold text-[#10213D] font-mono text-[11px]">Longitudinal Baseline</span>
           </div>
         </div>
       </div>

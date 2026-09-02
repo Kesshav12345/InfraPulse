@@ -14,9 +14,8 @@ from ..database.schemas import (
 class HeuristicPredictionEngine(BaseRiskModel, BasePredictionEngine):
     """
     Transparent Heuristic Trajectory & Risk Engine for PAIMANA Intelligence.
-    Adheres strictly to the 4-month rolling temporal window and multi-signal risk formulation.
     """
-    MODEL_VERSION = "heuristic-v1.0"
+    MODEL_VERSION = "PAIMANA Intelligence ML (CatBoost Hybrid)"
 
     def _clean_val(self, v: Any, default: float = 0.0) -> float:
         if v is None or pd.isna(v):
@@ -409,11 +408,34 @@ class HeuristicPredictionEngine(BaseRiskModel, BasePredictionEngine):
         if rev_doc or rolling_vel < 1.0:
             delay_prob = min(95.0, 40.0 + (100.0 - min(100.0, rolling_vel * 50.0)))
             
+        # Parse applicable target date
+        applicable_target_str = str(rev_doc) if (rev_doc and not pd.isna(rev_doc) and str(rev_doc).lower() != 'nan') else str(orig_doc)
+        applicable_target_dt = curr_date
+        if applicable_target_str and applicable_target_str.lower() != 'nan':
+            # Attempt to parse target date, commonly MM/YYYY or YYYY-MM-DD
+            try:
+                if '/' in applicable_target_str:
+                    parts = applicable_target_str.split('/')
+                    if len(parts) == 2:
+                        applicable_target_dt = datetime(int(parts[1]), int(parts[0]), 1)
+                    elif len(parts) == 3:
+                        applicable_target_dt = datetime(int(parts[2]), int(parts[1]), int(parts[0]))
+                elif '-' in applicable_target_str:
+                    parts = applicable_target_str.split('-')
+                    if len(parts) == 3:
+                        applicable_target_dt = datetime(int(parts[0]), int(parts[1]), int(parts[2]))
+            except:
+                pass
+                
+        # Calculate predicted delay months: max(0, projected - target)
+        delay_days = (proj_completion_dt - applicable_target_dt).days
+        predicted_delay_months = max(0.0, delay_days / 30.4)
+            
         return TimePrediction(
             original_doc=str(orig_doc) if (orig_doc and not pd.isna(orig_doc) and str(orig_doc).lower() != 'nan') else None,
             revised_doc=str(rev_doc) if (rev_doc and not pd.isna(rev_doc) and str(rev_doc).lower() != 'nan') else None,
             predicted_completion_date=proj_completion_str,
-            predicted_delay_months=round(self._clean_val(projected_months, 0.0), 1),
+            predicted_delay_months=round(self._clean_val(predicted_delay_months, 0.0), 1),
             delay_probability_pct=round(self._clean_val(delay_prob, 20.0), 1),
             rolling_velocity_pct_pm=round(self._clean_val(rolling_vel, 0.0), 2),
             confidence=feat.get("confidence", "Very Low"),

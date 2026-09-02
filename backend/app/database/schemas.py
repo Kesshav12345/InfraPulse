@@ -145,12 +145,12 @@ class StateRiskSummary(BaseModel):
 class ModelMetric(BaseModel):
     model_name: str
     model_type: str
-    mae_cost_cr: float
-    rmse_cost_cr: float
-    r2_score: float
-    schedule_mae_months: float
-    risk_classification_f1: float
-    risk_accuracy: float
+    mae_cost_cr: Optional[float] = None
+    rmse_cost_cr: Optional[float] = None
+    r2_score: Optional[float] = None
+    schedule_mae_months: Optional[float] = None
+    risk_classification_f1: Optional[float] = None
+    risk_accuracy: Optional[float] = None
     features_used: str
     status: str
 
@@ -177,7 +177,25 @@ class DataHealthOutput(BaseModel):
     latest_report_date: str
     months_covered_count: int
     database_engine: str
+    
+    # Detailed Data Quality Flags
+    cost_below_150cr_count: int
+    invalid_physical_progress_count: int
+    negative_cumulative_expenditure_count: int
+    negative_financial_burn_count: int
+    invalid_revised_cost_count: int
     missing_physical_progress_count: int
-    missing_revised_doc_count: int
+    missing_completion_dates_count: int
+    duplicate_records_count: int
+    malformed_dates_count: int
+    inconsistent_geography_count: int
+    short_history_count: int
+    
+    # Eligibility & Limitations
+    eligible_for_cost_model_count: int
+    eligible_for_schedule_model_count: int
+    excluded_count: int
+    exclusion_reasons: Dict[str, int]
+    
     data_quality_pct: float
     status: str

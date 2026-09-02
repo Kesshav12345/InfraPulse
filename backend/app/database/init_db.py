@@ -61,6 +61,22 @@ def init_database():
             print(f"[DB Init] Successfully ingested {len(records)} records into database.")
         else:
             print(f"[DB Init] Database already populated with {count} records.")
+
+        # Seed users if they don't exist
+        from .models import User
+        from ..api.auth import get_password_hash
+        user_count = db.query(User).count()
+        if user_count == 0:
+            print("[DB Init] Seeding demo users...")
+            demo_users = [
+                User(username="admin", password_hash=get_password_hash("admin"), role="ADMIN"),
+                User(username="engineer", password_hash=get_password_hash("engineer"), role="ENGINEER", ministry="Road Transport and Highways"),
+                User(username="viewer", password_hash=get_password_hash("viewer"), role="VIEWER")
+            ]
+            db.bulk_save_objects(demo_users)
+            db.commit()
+            print("[DB Init] Successfully seeded demo users.")
+            
     except Exception as e:
         print(f"[DB Init] Error during database initialization: {e}")
         db.rollback()

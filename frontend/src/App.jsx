@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useLocation, Navigate } from 'react-router-dom';
 import GovHeader from './components/layout/GovHeader';
 import Sidebar from './components/layout/Sidebar';
-import SystemMetaBar from './components/layout/SystemMetaBar';
 
 import Dashboard from './pages/Dashboard';
 import ProjectExplorer from './pages/ProjectExplorer';
@@ -12,13 +11,18 @@ import EarlyWarnings from './pages/EarlyWarnings';
 import SectorAnalytics from './pages/SectorAnalytics';
 import PredictiveAnalytics from './pages/PredictiveAnalytics';
 import EscalationDrivers from './pages/EscalationDrivers';
-import IntelligenceAssistant from './pages/IntelligenceAssistant';
-import Methodology from './pages/Methodology';
-import DataHealth from './pages/DataHealth';
+import SystemOpsMethodology from './pages/SystemOpsMethodology';
+import Login from './pages/Login';
+import { AuthProvider, useAuth } from './components/layout/AuthContext';
+import { FilterProvider } from './context/FilterContext';
 import { api } from './services/api';
 
-function App() {
+function AppLayout() {
   const [kpis, setKpis] = useState(null);
+  const location = useLocation();
+  const { user, loading } = useAuth();
+  
+  const isLoginPage = location.pathname === '/login';
 
   useEffect(() => {
     api.getDashboardSummary()
@@ -26,33 +30,44 @@ function App() {
       .catch((err) => console.error('Failed to load system KPIs:', err));
   }, []);
 
+  if (loading) return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+
+  if (isLoginPage) {
+    return <Routes><Route path="/login" element={<Login />} /></Routes>;
+  }
+
   return (
-    <BrowserRouter>
-      <div className="flex flex-col min-h-screen font-sans bg-slate-50">
-        <GovHeader latestDate={kpis?.latest_report_month_year || 'July 2026'} />
-        <SystemMetaBar kpis={kpis} />
-        
-        <div className="flex flex-1">
-          <Sidebar warningCount={kpis?.projects_requiring_attention || 0} />
-          
-          <main className="flex-1 overflow-x-hidden bg-slate-50 min-h-[calc(100vh-140px)]">
-            <Routes>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/projects" element={<ProjectExplorer />} />
-              <Route path="/project/:code" element={<ProjectDetail />} />
-              <Route path="/risk-monitor" element={<RiskMonitor />} />
-              <Route path="/early-warnings" element={<EarlyWarnings />} />
-              <Route path="/sectors" element={<SectorAnalytics />} />
-              <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
-              <Route path="/drivers" element={<EscalationDrivers />} />
-              <Route path="/assistant" element={<IntelligenceAssistant />} />
-              <Route path="/methodology" element={<Methodology />} />
-              <Route path="/data-health" element={<DataHealth />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
-    </BrowserRouter>
+    <div className="flex flex-col min-h-screen font-sans bg-[#E2ECF6]">
+      <GovHeader latestDate={kpis?.latest_report_month_year || 'July 2026'} />
+      <Sidebar warningCount={kpis?.projects_requiring_attention || 0} />
+      
+      <main className="flex-1 overflow-x-hidden bg-[#E2ECF6] min-h-[calc(100vh-140px)]">
+        <Routes>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/projects" element={<ProjectExplorer />} />
+          <Route path="/project/:code" element={<ProjectDetail />} />
+          <Route path="/risk-monitor" element={<RiskMonitor />} />
+          <Route path="/early-warnings" element={<EarlyWarnings />} />
+          <Route path="/sectors" element={<SectorAnalytics />} />
+          <Route path="/predictive-analytics" element={<PredictiveAnalytics />} />
+          <Route path="/drivers" element={<EscalationDrivers />} />
+          <Route path="/system-ops" element={<SystemOpsMethodology />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
+      </main>
+    </div>
+  );
+}
+
+function App() {
+  return (
+    <AuthProvider>
+      <FilterProvider>
+        <BrowserRouter>
+          <AppLayout />
+        </BrowserRouter>
+      </FilterProvider>
+    </AuthProvider>
   );
 }
 

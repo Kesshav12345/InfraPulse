@@ -4,7 +4,7 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 class Settings(BaseSettings):
     model_config = SettingsConfigDict(env_file=".env", extra="allow")
 
-    PROJECT_NAME: str = "InfraPulse Intelligence API"
+    PROJECT_NAME: str = "PAIMANA Intelligence API"
     VERSION: str = "1.0.0"
     API_PREFIX: str = "/api"
     
@@ -15,8 +15,13 @@ class Settings(BaseSettings):
     CSV_PATH: str = os.getenv("CSV_PATH", os.path.abspath(os.path.join(os.path.dirname(__file__), "../../paimana_timeseries_master.csv")))
     
     # Analytical Engine
-    MODEL_VERSION: str = "heuristic-v1.0"
+    MODEL_VERSION: str = "PAIMANA Intelligence ML (CatBoost Hybrid)"
     ENABLE_PRECOMPUTED_CACHE: bool = True
+    
+    # Auth
+    JWT_SECRET_KEY: str = os.getenv("JWT_SECRET_KEY", "paimana_intelligence_secret_key_change_me")
+    
+
     
     # CORS
     CORS_ORIGINS: list[str] = ["*"]

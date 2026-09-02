@@ -83,3 +83,34 @@ class EarlyWarning(Base):
     detected_date = Column(Date, nullable=False)
     model_version = Column(String(50), nullable=False)
     created_at = Column(DateTime, server_default=func.now())
+
+class User(Base):
+    __tablename__ = "users"
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    username = Column(String(50), unique=True, nullable=False, index=True)
+    password_hash = Column(String(128), nullable=False)
+    role = Column(String(20), nullable=False) # ADMIN, ENGINEER, VIEWER
+    ministry = Column(String(150), nullable=True) # For ENGINEER role scoping
+    is_active = Column(Integer, default=1)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+
+class Intervention(Base):
+    __tablename__ = "interventions"
+
+    intervention_id = Column(Integer, primary_key=True, autoincrement=True)
+    project_code = Column(String(50), nullable=False, index=True)
+    warning_reference = Column(Integer, nullable=True) # Optional link to EarlyWarning.warning_id
+    ministry = Column(String(150), nullable=True)
+    assigned_to_user_id = Column(Integer, ForeignKey('users.id'), nullable=True)
+    created_by = Column(Integer, ForeignKey('users.id'), nullable=False)
+    status = Column(String(20), nullable=False, default="OPEN") # OPEN, ACKNOWLEDGED, IN_PROGRESS, RESOLVED, CLOSED
+    priority = Column(String(20), nullable=False, default="MODERATE") # CRITICAL, HIGH, MODERATE
+    recommended_review_area = Column(Text, nullable=True)
+    evidence_summary = Column(Text, nullable=True)
+    engineer_response_note = Column(Text, nullable=True)
+    due_date = Column(Date, nullable=True)
+    created_at = Column(DateTime, server_default=func.now())
+    updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now())
+    resolved_at = Column(DateTime, nullable=True)

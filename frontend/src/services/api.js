@@ -2,12 +2,18 @@ const API_BASE = import.meta.env.VITE_API_URL || 'http://127.0.0.1:8000/api';
 
 async function fetchJson(endpoint, options = {}) {
   try {
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Content-Type': 'application/json',
+      ...(options.headers || {})
+    };
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
     const res = await fetch(`${API_BASE}${endpoint}`, {
       ...options,
-      headers: {
-        'Content-Type': 'application/json',
-        ...(options.headers || {})
-      }
+      headers
     });
     if (!res.ok) {
       const errData = await res.json().catch(() => ({}));
@@ -21,6 +27,29 @@ async function fetchJson(endpoint, options = {}) {
 }
 
 export const api = {
+  // Auth
+  login: async (username, password) => {
+    const formData = new URLSearchParams();
+    formData.append('username', username);
+    formData.append('password', password);
+    const res = await fetch(`${API_BASE}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: formData.toString()
+    });
+    if (!res.ok) throw new Error('Login failed');
+    return res.json();
+  },
+  getMe: () => fetchJson('/auth/me'),
+
+  // Interventions
+  getInterventions: (params = {}) => {
+    const q = new URLSearchParams(params);
+    return fetchJson(`/interventions?${q.toString()}`);
+  },
+  createIntervention: (data) => fetchJson('/interventions/', { method: 'POST', body: JSON.stringify(data) }),
+  updateIntervention: (id, data) => fetchJson(`/interventions/${id}`, { method: 'PATCH', body: JSON.stringify(data) }),
+
   // Dashboard
   getDashboardSummary: () => fetchJson('/dashboard/summary'),
   getStateRisks: () => fetchJson('/dashboard/state-risks'),
@@ -66,9 +95,6 @@ export const api = {
   getPortfolioDrivers: () => fetchJson('/analytics/drivers'),
 
   // Assistant & Operations
-  queryIntelligence: (query) => fetchJson('/intelligence/query', {
-    method: 'POST',
-    body: JSON.stringify({ query })
-  }),
+
   getDataHealth: () => fetchJson('/data/health')
 };

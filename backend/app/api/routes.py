@@ -3,7 +3,6 @@ from typing import List, Dict, Any, Optional
 from ..services.data_service import data_service
 from ..engine.heuristic_model import heuristic_engine
 from ..engine.ml_engine import model_benchmark_service
-from ..engine.assistant_engine import assistant_engine
 from ..database.database import DB_ENGINE_TYPE
 from ..database.schemas import (
     DashboardKPIs,
@@ -17,10 +16,11 @@ from ..database.schemas import (
     SectorPerformance,
     StateRiskSummary,
     ModelComparisonOutput,
-    DataHealthOutput,
-    IntelligenceQueryRequest,
-    IntelligenceQueryResponse
+    DataHealthOutput
 )
+from ..database.models import User
+from .auth import get_current_user_optional, require_role
+from fastapi import Depends
 
 router = APIRouter()
 
@@ -56,9 +56,14 @@ def list_projects(
     sort_by: str = Query("risk_score", description="Sort field"),
     sort_order: str = Query("desc", description="Sort order: asc or desc"),
     page: int = Query(1, ge=1, description="Page number"),
-    page_size: int = Query(25, ge=1, le=100, description="Items per page")
+    page_size: int = Query(25, ge=1, le=100, description="Items per page"),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     """Search and filter projects across the national infrastructure portfolio."""
+    # Enforce ENGINEER ministry scope
+    if current_user and current_user.role == "ENGINEER":
+        ministry = current_user.ministry
+        
     return data_service.get_projects(
         search=search,
         ministry=ministry,
@@ -76,11 +81,19 @@ def list_projects(
     )
 
 @router.get("/projects/{project_code}", response_model=ProjectDetailOutput)
-def get_project_detail(project_code: str):
+def get_project_detail(project_code: str, current_user: Optional[User] = Depends(get_current_user_optional)):
     """Retrieves full Project Intelligence profile including risk, predictions, and trajectory."""
     detail = data_service.get_project_detail_by_code(project_code)
     if not detail:
         raise HTTPException(status_code=404, detail=f"Project '{project_code}' not found.")
+        
+    if current_user and current_user.role == "ENGINEER" and detail.summary.ministry != current_user.ministry:
+        raise HTTPException(status_code=403, detail="Not authorized to view this project.")
+        
+    # Mask sensitive recommendations for unauthenticated / viewers
+    if not current_user or current_user.role not in ["ADMIN", "ENGINEER"]:
+        detail.administrative_recommendations = ["(Restricted) Please log in with appropriate privileges to view administrative recommendations."]
+        
     return detail
 
 @router.get("/projects/{project_code}/history", response_model=List[Dict[str, Any]])
@@ -206,10 +219,24 @@ def get_risk_trends():
 def list_early_warnings(
     severity: Optional[str] = Query(None, description="Filter by severity: CRITICAL, HIGH, MODERATE"),
     sector: Optional[str] = Query(None, description="Filter by sector"),
-    limit: int = Query(50, ge=1, le=200, description="Max records to return")
+    limit: int = Query(50, ge=1, le=200, description="Max records to return"),
+    current_user: Optional[User] = Depends(get_current_user_optional)
 ):
     """Lists dynamic early warning alerts triggered across the national infrastructure portfolio."""
-    return data_service.get_early_warnings(severity=severity, sector=sector, limit=limit)
+    warns = data_service.get_early_warnings(severity=severity, sector=sector, limit=limit)
+    
+    # Enforce ENGINEER ministry scope via heuristic cross-reference
+    # For a robust implementation, early_warning should store ministry.
+    # We will filter out if not authorized.
+    if current_user and current_user.role == "ENGINEER":
+        filtered_warns = []
+        for w in warns:
+            proj = data_service.get_project_detail_by_code(w.project_code)
+            if proj and proj.summary.ministry == current_user.ministry:
+                filtered_warns.append(w)
+        return filtered_warns
+        
+    return warns
 
 # -------------------------------------------------------------------------
 # 4. Sector Analytics Endpoints
@@ -291,36 +318,11 @@ def get_portfolio_drivers():
     }
 
 # -------------------------------------------------------------------------
-# 6. Natural Language Assistant & Data Health Endpoints
+# 6. Data Health Endpoints
 # -------------------------------------------------------------------------
-
-@router.post("/intelligence/query", response_model=IntelligenceQueryResponse)
-def query_intelligence_assistant(payload: IntelligenceQueryRequest = Body(...)):
-    """Natural Language Project Intelligence query interface with guaranteed verified answers."""
-    return assistant_engine.process_query(payload.query, data_service)
 
 @router.get("/data/health", response_model=DataHealthOutput)
 def get_data_health():
     """System operations and data quality health report."""
-    df = data_service.df
-    total_records = len(df)
-    unique_projects = int(df['Project_Code'].nunique()) if not df.empty else 0
-    
-    missing_prog = int(df['Physical_Progress'].isna().sum()) if not df.empty else 0
-    missing_doc = int(df['Revised_DoC'].isna().sum()) if not df.empty else 0
-    
-    quality_pct = 100.0 - ((missing_prog / max(1, total_records)) * 10.0)
-    quality_pct = max(80.0, min(100.0, quality_pct))
-    
-    return DataHealthOutput(
-        total_records=total_records,
-        unique_projects=unique_projects,
-        earliest_report_date="2025-04-01",
-        latest_report_date="2026-07-01",
-        months_covered_count=16,
-        database_engine=DB_ENGINE_TYPE.upper(),
-        missing_physical_progress_count=missing_prog,
-        missing_revised_doc_count=missing_doc,
-        data_quality_pct=round(quality_pct, 1),
-        status="OPERATIONAL"
-    )
+    return data_service.get_data_health_stats()
+
