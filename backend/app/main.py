@@ -42,7 +42,7 @@ app.include_router(router, prefix=settings.API_PREFIX)
 def root():
     return {
         "status": "online",
-        "system": "InfraPulse Intelligence API",
+        "system": "PAIMANA Intelligence API",
         "version": settings.VERSION,
         "docs_url": "/docs",
         "api_prefix": settings.API_PREFIX

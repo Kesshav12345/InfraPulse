@@ -1,9 +1,10 @@
-# Environments and Secrets
+# Environments and Secrets (Never commit secrets!)
 .env
 .env.*
 *.env
+!.env.example
 
-# Python Bytecode and Cache
+# Python Bytecode and Caches
 __pycache__/
 *.py[cod]
 *$py.class
@@ -25,30 +26,34 @@ frontend/node_modules/
 frontend/dist/
 dist/
 build/
+.npm
+.yarn
 
-# Temporary HTML & Media
+# Local Scratch, Caches & Temporary Artifacts
+.freebuff/
+catboost_info/
+scratch/
 *.temp.html
 *_temp.html
 .tempmediaStorage/
 .user_uploaded/
-scratch/
+*.tmp
+*.log
 
-# Presentation & Briefing Materials (Local only)
+# Raw Offline Dataset & Scripts (Master data paimana_timeseries_master.csv & paimana.db are kept)
+dataset sih/
+*.pdf
+
+# Prompts & Presentation Notes
+*MASTER BUILD PROMPT*
 SIH_PITCH_SCRIPT.*
 SIH_PROJECT_MASTER_BRIEF.*
-generate_pdfs.py
 
-# Raw PDF Dataset (Master data paimana_timeseries_master.csv & paimana.db are tracked)
-dataset sih/
-
-# IDE & OS Junk
+# IDE & Operating System Files
 .vscode/
 .idea/
 *.swp
 *.swo
 .DS_Store
 Thumbs.db
-*.log
-\# MASTER BUILD PROMPT.txt
-*MASTER BUILD PROMPT*
-*.tmp
+desktop.ini

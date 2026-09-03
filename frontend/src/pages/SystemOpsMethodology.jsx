@@ -238,7 +238,7 @@ export default function SystemOpsMethodology() {
               <span className="text-[10px] font-mono uppercase tracking-widest text-[#1689ca] font-bold">Dual-Engine Analytical Framework</span>
               <h2 className="text-base font-black text-slate-900 tracking-tight mt-0.5">Two Distinct Modeling Paradigms in Production</h2>
               <p className="text-xs text-slate-600 mt-1 max-w-2xl leading-relaxed">
-                InfraPulse divides analytical intelligence into two dedicated workflows: a <strong>Deterministic Heuristic & Regressive Engine</strong> for exact rupee/time forecasts, and a <strong>CatBoost Gradient Boosted Classifier</strong> for non-linear early warning detection.
+                PAIMANA Intelligence divides analytical intelligence into two dedicated workflows: a <strong>Deterministic Heuristic & Regressive Engine</strong> for exact rupee/time forecasts, and a <strong>CatBoost Gradient Boosted Classifier</strong> for non-linear early warning detection.
               </p>
             </div>
             <div className="px-3 py-1.5 bg-blue-50 border border-blue-200 text-[#1689ca] rounded text-xs font-mono font-bold shrink-0">
